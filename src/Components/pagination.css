@@ -1,0 +1,51 @@
+.custom-pagination .page-item.active .page-link {
+    background-color: red;
+    border-color: red;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+}
+
+.custom-pagination .page-link {
+    color: black;
+    border: none;
+}
+
+.custom-pagination .page-item {
+    margin: 0 4px;
+}
+
+.custom-pagination .page-item .page-link:hover {
+    background-color: transparent;
+    color: black;
+}
+
+.custom-pagination .page-item.active .page-link:hover {
+    background-color: red;
+    color: white;
+}
+
+.custom-pagination .page-item.disabled .page-link {
+    color: lightgray;
+    background-color: transparent;
+}
+
+.custom-pagination .page-item .page-link {
+    padding: 0;
+    height: 32px;
+    width: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.custom-pagination .page-item:first-child .page-link, 
+.custom-pagination .page-item:last-child .page-link {
+    width: auto;
+    padding: 0 10px;
+    border-radius: 5px;
+}
