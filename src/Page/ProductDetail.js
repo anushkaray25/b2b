@@ -1,29 +1,43 @@
-import React, { useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import productsData from '../Components/productsData';
 import './ProductDetail.css';
 import leftArrow from '../Components/leftArrow.svg';
 import rightArrow from '../Components/rightArrow.svg';
 import productThumb from '../Page/product.svg';
-import yellowOnion from '../Page/product.svg';
-import bananas from '../Page/product.svg';
-import broccoli from '../Page/product.svg';
-import garlic from '../Page/product.svg';
-import apple from '../Page/product.svg';
 import QuantitySelector from '../Components/QuantitySelector';
 import { Container } from 'react-bootstrap';
 import ProductCard from '../Components/ProductCard';
+import yellowOnion from './product.svg';
+import bananas from './product.svg';
+import broccoli from './product.svg';
+import garlic from './product.svg';
+import apple from './product.svg';
+
 const ProductDetail = () => {
     const { productId } = useParams();
     const product = productsData.find(p => p.id === parseInt(productId));
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const location = useLocation();
-    const relatedProducts = location.state?.relatedProducts || [];
+    const [relatedProducts, setRelatedProducts] = useState([]);
+    const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+
+    const fetchRelatedProducts = () => {
+        const related = productsData.filter(p => p.category === product.category && p.id !== product.id);
+        setRelatedProducts(related);
+    };
+
+    useEffect(() => {
+        if (product) {
+            fetchRelatedProducts();
+        }
+    }, [product]);
+
     if (!product) {
         return <div>Product not found</div>;
     }
 
     const images = [productThumb, productThumb, productThumb, productThumb, productThumb];
+    const itemsPerSlide = 4;
 
     const handlePrevClick = () => {
         setCurrentImageIndex((prevIndex) => (prevIndex === 0 ? images.length - 1 : prevIndex - 1));
@@ -31,6 +45,14 @@ const ProductDetail = () => {
 
     const handleNextClick = () => {
         setCurrentImageIndex((prevIndex) => (prevIndex === images.length - 1 ? 0 : prevIndex + 1));
+    };
+
+    const handlePrevSlideClick = () => {
+        setCurrentSlideIndex((prevIndex) => Math.max(prevIndex - itemsPerSlide, 0));
+    };
+
+    const handleNextSlideClick = () => {
+        setCurrentSlideIndex((prevIndex) => Math.min(prevIndex + itemsPerSlide, relatedProducts.length - itemsPerSlide));
     };
 
     return (
@@ -92,7 +114,6 @@ const ProductDetail = () => {
                             </div>
                         </div>
                     </div>
-
                 </div>
                 <div className="col-md-3">
                     <div className="frequently-bought">
@@ -132,12 +153,11 @@ const ProductDetail = () => {
                 <section>
                     <Container fluid>
                         <div className="description-title">
-                            <h2 >Description </h2>
+                            <h2>Description</h2>
                         </div>
                         <hr className='hrule' />
                     </Container>
                 </section>
-
                 <p className="long-description">{product.longdescription}</p>
                 <div className='row'>
                     <div className="col-md-4">
@@ -149,7 +169,7 @@ const ProductDetail = () => {
                         <div className="description-text">
                             <h3 className="description-heading">{product.title}</h3>
                             <p>{product.longdescription}</p>
-                            <ul class='better'>
+                            <ul className='better'>
                                 <li>Pellentesque habitant morbi tristique senectus</li>
                                 <li>turpis egestas Vestibulum tortor quam</li>
                                 <li>euugiat vitae ultricies eget tempor</li>
@@ -160,18 +180,40 @@ const ProductDetail = () => {
                     </div>
                 </div>
             </div>
-            <div className='row '>
-                <div className='related-products'>
-                    <h4 className='col-12'>Related Products</h4>
-                    {relatedProducts.map((relatedProductId) => {
-                        const relatedProduct = productsData.find(p => p.id === relatedProductId);
-                        return relatedProduct ? (
-                            <div key={relatedProduct.id} className="col-md-3">
-                                <ProductCard product={relatedProduct} onToggleFavorite={() => { }} />
-                            </div>
-                        ) : null;
-                    })}
-                </div>
+            <div className='row'>
+                <section className="related-products">
+                    <span >
+                        <h4 className="col-11">Related Products</h4>
+                        <span className='col-1'>
+                            <button className="arrow-button" onClick={handlePrevSlideClick}>
+                                <img src={leftArrow} alt="Previous" />
+                            </button>
+
+                            <button className="arrow-button" onClick={handleNextSlideClick}>
+                                <img src={rightArrow} alt="Next" />
+                            </button>
+                        </span>
+                    </span>
+                    <div id="slider">
+                        <div className="related-products-list" style={{ transform: `translateX(-${currentSlideIndex * (100 / itemsPerSlide)}%)` }}>
+                            {relatedProducts.map((relatedProduct, index) => (
+                                <div className="related-products-item" key={index}>
+                                    <ProductCard product={relatedProduct} />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <div className='row'>
+                <section>
+                    <Container fluid ps-1>
+                        <div className="description-title">
+                            <h2>Customer Reviews</h2>
+                        </div>
+                        <hr className='hrule' />
+                    </Container>
+                </section>
             </div>
         </div>
     );
